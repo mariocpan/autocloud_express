@@ -1,0 +1,80 @@
+<html>
+<head>
+ <meta charset="UTF-8">
+</head>
+<body>
+<h1>AUTOCLOUD PARKING</h1>
+<h2>Formulario de registro </h2>
+<form id="formRegistro">
+<label>Placa</label>
+<input type="text" id="placa" name="placa" required>
+<label>Tipo de vehiculo</label>
+<select id="tipo" name="tipo" required>
+    <option value=""> seleccionar tipo de vehiculo</option>
+    <option value="carro">Carro</option>
+    <option value="moto">Moto</option>
+    <option value="bicicleta">Bicicleta</option>
+</select>
+<button type ="submit">Registrar</button>
+</form>
+<p id="mensaje"></p>
+<h3>Buscar vehiculo</h3>
+<form id="formBusqueda">
+  <label>Placa</label>  
+  <input type="text" id="placaBusqueda" name="placaBusqueda">
+  <button type="submit">Buscar</button>
+  </form>
+  <p id="mensajeBusqueda"></p>
+  <ul id="Resultados"></ul>
+  <p id="detalle"></p>
+  <script>
+    // Cuando se envia el formulario, mandamos los datos al servidor
+    document.getElementById('formRegistro').addEventListener('submit', async (e) => {
+      e.preventDefault(); // evita que la pagina se recargue
+      const respuesta = await fetch('/vehiculos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placa: document.getElementById('placa').value,
+          tipo: document.getElementById('tipo').value
+        })
+      });
+        const datos = await respuesta.json();
+      // Mostramos el resultado debajo del formulario
+      if (respuesta.ok) {
+        document.getElementById('mensaje').textContent = 'Vehiculo registrado: ' + datos.placa;
+      } else {
+        document.getElementById('mensaje').textContent = datos.mensaje;
+      }
+    });
+
+    // Cuando se envia la busqueda, consultamos al servidor
+document.getElementById('formBusqueda').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const lista = document.getElementById('Resultados');
+  lista.innerHTML = ''; 
+  document.getElementById('detalle').textContent = ''; // limpia el detalle anterior
+  const placa = document.getElementById('placaBusqueda').value;
+  const respuesta = await fetch('/vehiculos/buscar?placa=' + encodeURIComponent(placa));
+  const datos = await respuesta.json();
+  // Si hay error o no hay coincidencias, mostramos el mensaje
+  if (!respuesta.ok) {
+    document.getElementById('mensajeBusqueda').textContent = datos.mensaje;
+    return;
+  }
+  document.getElementById('mensajeBusqueda').textContent = '';
+  // Por cada vehiculo encontrado, agregamos una linea a la lista
+  datos.forEach((v) => {
+    const li = document.createElement('li');
+    li.textContent = v.placa + ' - ' + v.tipo + ' - ' + new Date(v.fechaIngreso).toLocaleString('es-CO');
+    // Al hacer clic, mostramos los detalles del vehiculo seleccionado
+    li.style.cursor = 'pointer';
+    li.addEventListener('click', () => {
+      document.getElementById('detalle').textContent = 'Detalle del vehiculo - Placa: ' + v.placa + ' | Tipo: ' + v.tipo + ' | Ingreso: ' + new Date(v.fechaIngreso).toLocaleString('es-CO');
+    });
+    lista.appendChild(li);
+  });
+  });
+  </script>
+</body>
+</html>

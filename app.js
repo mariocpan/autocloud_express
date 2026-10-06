@@ -7,6 +7,8 @@ const app = express();
 const PUERTO = 3000;
 //Permite que el servidor encienda datos en formato JSON
 app.use(express.json());
+// Carpeta publica: aqui van las paginas que ve el usuario
+app.use(express.static('public'));
 // Todas las rutas de vehiculos empiezan con /vehiculos
 app.use('/vehiculos', require('./routes/vehiculos'))
 //Ruta de prueba para saber que el servidor esta activo
