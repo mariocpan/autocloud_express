@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
     } catch (error) {
     // Placa repetida
     if (error.code === 11000) {
-      return res.status(400).json({ mensaje: 'La placa ya esta registrada' });
+      return res.status(409).json({ mensaje: 'La placa ya esta registrada' });
     }
     // Primer error de validacion de la ficha
     res.status(400).json({ mensaje: Object.values(error.errors)[0].message });
@@ -40,6 +40,25 @@ if(vehiculos.length === 0) {
 }
 res.json(vehiculos);
 });
-// Exportamos las rutas para usarlas en app.js
+//Cambia el tipo de vehiculo
+router.put('/:placa', async (req, res) => {
+  try {
+// Busca y cambia solo el tipo 
+const vehiculo = await Vehiculo.findOneAndUpdate(
+  { placa: req.params.placa.toUpperCase() },
+  { tipo: req.body.tipo },
+  { returnDocument: 'after', runValidators: true }
+); 
+// No hay ficha con esa placa
+if (!vehiculo) {
+  return res.status(404).json({ mensaje: 'Vehiculo no encontrado' });
+}
+  res.json(vehiculo);
+ } catch (error) {
+// Tipo de error valido  o error de datos
+  res.status(400).json({mensaje: error.errors ? Object.values(error.errors)[0].message :error.message});
+}   
+});
 
+// Exportamos las rutas para usarlas en app.js
 module.exports = router;
