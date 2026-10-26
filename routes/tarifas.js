@@ -9,6 +9,35 @@ router.get('/', async (req, res) => {
     const tarifas = await Tarifa.find();
     res.json(tarifas);
 });
+// PUT cambia el valor por hora de una tarifa
+router.put('/:tipo', async (req, res) => {
+try {
+ // Busca la ficha por tipo y cambia solo el valor por hora    
+const tarifa = await Tarifa.findOneAndUpdate(
+{ tipo: req.params.tipo },
+{ valorHora: req.body.valorHora },
+{ returnDocument: 'after', runValidators: true }
+);
+// No hay tarifa para ese tipo
+if (!tarifa) {
+return res.status(404).json({ mensaje:'Tarifa no encontrada'});
+}
+res.json(tarifa);
+} catch (error) {
+ // Valor no valido u otro error de datos
+res.status(400).json({ mensaje: error.errors ? Object.values(error. errors)[0].message : error. message});
+}
+});
+
+
+
+
+
+
+
+
+
+
 // Exportamos las rutas para usarlas en app.js
 module.exports = router;
 // POST guarda una tarifa nueva
