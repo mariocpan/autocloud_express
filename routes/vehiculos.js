@@ -59,6 +59,15 @@ if (!vehiculo) {
   res.status(400).json({mensaje: error.errors ? Object.values(error.errors)[0].message :error.message});
 }   
 });
-
+//elimina un vehiculo 
+router.delete('/:placa', async (req, res) => {
+// Busca  vehiculo  por placa y lo elimina  
+const vehiculo = await Vehiculo.findOneAndDelete({ placa: req.params.placa.toUpperCase() }); 
+//NO  hay ficha con esa placa
+if(!vehiculo) {
+return res.status(404).json({ mensaje:'vehiculo no encontrado'});
+}
+res.json({ mensaje:'Vehiculo eliminado'});
+});
 // Exportamos las rutas para usarlas en app.js
 module.exports = router;
