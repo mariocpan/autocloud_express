@@ -10,7 +10,9 @@ app.use(express.json());
 // Carpeta publica: aqui van las paginas que ve el usuario
 app.use(express.static('public'));
 // Todas las rutas de vehiculos empiezan con /vehiculos
-app.use('/vehiculos', require('./routes/vehiculos'))
+app.use('/vehiculos', require('./routes/vehiculos'));
+// Todas las rutas de tarifas empiezan con /tarifas
+app.use('/tarifas', require('./routes/tarifas'));
 //Ruta de prueba para saber que el servidor esta activo
 app.get('/', (req, res) => {
   res.send('AutoCloud  Parking funcionando');
