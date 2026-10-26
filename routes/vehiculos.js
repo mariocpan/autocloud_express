@@ -31,7 +31,7 @@ router.get('/buscar', async (req, res) => {
   const placa = (req.query.placa || '').trim();
   // La placa solo puede tener letras y numeros
   if (!/^[A-Za-z0-9]+$/.test(placa)) {
-    return res.status(400).json({ mensaje: 'la placa solo puede tener letras y numeros' });
+    return res.status(400).json({ mensaje: 'La placa solo puede tener letras y numeros' });
   }
   // Busca las fichas que contengan ese texto, sin importar mayusculas 
   const vehiculos = await Vehiculo.find({ placa: new RegExp(placa, 'i') });
@@ -65,9 +65,23 @@ router.delete('/:placa', async (req, res) => {
   const vehiculo = await Vehiculo.findOneAndDelete({ placa: req.params.placa.toUpperCase() });
   //NO  hay ficha con esa placa
   if (!vehiculo) {
-    return res.status(404).json({ mensaje: 'vehiculo no encontrado' });
+    return res.status(404).json({ mensaje: 'Vehiculo no encontrado' });
   }
   res.json({ mensaje: 'Vehiculo eliminado' });
 });
+// Get cuanto cobrar por vehiculos
+router.get('/:placa/tarifa', async (req, res) => {
+// Busca la ficha del vehiculo por placa
+const vehiculo = await Vehiculo.findOne({ placa: req.params.placa.toUpperCase() });
+// No hay ficha con esa placa
+if (!vehiculo) {
+return res.status(404).json({mensaje:'Vehiculo no encontrado'});
+}
+// Tiempo que lleva en el parqueadero, en milisegundos
+const milisegundos = Date.now()-vehiculo.fechaIngreso;
+// Pasamos a horas, redondeamos hacia arriba y cobramos minimo 1 hora
+const  horas =  Math.max(1, Math.ceil(milisegundos/(1000*60*60)));
+res.json({ placa: vehiculo.placa,tipo: vehiculo.tipo,fechaIngreso:vehiculo.fechaIngreso,horas});
+}); 
 // Exportamos las rutas para usarlas en app.js
 module.exports = router;
