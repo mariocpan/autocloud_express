@@ -1,10 +1,28 @@
-                                                        # API de AutoCloud 
-   Servicio	            Verbo y ruta	                     Qué hace	                                      Respuestas
-Listar vehículos	    GET /vehiculos	            Devuelve todas las fichas	                                200
-Buscar vehículo	    GET /vehiculos/:placa	      Devuelve una ficha por placa	                           200, 404
-Registrar vehículo	 POST /vehiculos	            Guarda   una ficha nueva	                            201, 400, 409
-Actualizar vehículo	 PUT /vehiculos/:placa	      Cambia el tipo de un vehículo	                         200, 400, 404
-Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador                             200, 40
+# API de AutoCloud Parking
+
+API REST del proyecto AutoCloud Parking, para registrar vehículos, consultar tarifas y calcular el cobro por tiempo de permanencia. Está hecha con Node.js, Express, Mongoose y MongoDB.
+
+## Cómo ejecutarla
+
+1. Instalar las librerías: `npm install`
+2. Tener MongoDB encendido en `mongodb://127.0.0.1:27017`. La base de datos se llama `autocloudparking`.
+3. Encender el servidor: `npm start`. Queda en http://localhost:3000
+
+## Servicios
+
+| Servicio | Verbo y ruta | Requerimiento | Respuestas |
+| --- | --- | --- | --- |
+| Registrar vehículo | POST /vehiculos | HU02 | 201, 400, 409 |
+| Listar vehículos | GET /vehiculos | HU03 | 200 |
+| Buscar vehículo | GET /vehiculos/buscar?placa=ABC | HU03 | 200, 400, 404 |
+| Actualizar vehículo | PUT /vehiculos/:placa | Apoyo | 200, 400, 404 |
+| Eliminar vehículo | DELETE /vehiculos/:placa | Apoyo | 200, 404 |
+| Calcular tarifa | GET /vehiculos/:placa/tarifa | HU04 | 200, 404 |
+| Listar tarifas | GET /tarifas | HU04 | 200 |
+| Registrar tarifa | POST /tarifas | HU04 | 201, 400, 409 |
+| Actualizar tarifa | PUT /tarifas/:tipo | HU04 | 200, 400, 404 |
+
+## Detalle de cada servicio
 
 ## Registrar vehículo
 
@@ -17,6 +35,16 @@ Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador 
   - 201: vehículo creado, devuelve la ficha con su fecha de ingreso.
   - 400: dato inválido, devuelve el mensaje del error.
   - 409: La placa ya esta registrada.
+
+## Listar vehículos
+
+- **Método y ruta:** GET /vehiculos
+- **Descripción:** devuelve todos los vehículos registrados.
+- **Requerimiento:** HU03
+- **Datos de entrada:** ninguno.
+- **Ejemplo de petición:** GET /vehiculos
+- **Respuestas:**
+  - 200: lista de vehículos con placa, tipo y fechaIngreso (vacía si no hay ninguno).
 
 ## Buscar vehículo
 
@@ -32,7 +60,7 @@ Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador 
 
 ## Actualizar vehículo
 
- **Método y ruta:** PUT /vehiculos/:placa
+- **Método y ruta:** PUT /vehiculos/:placa
 - **Descripción:** cambia el tipo de un vehículo ya registrado, buscándolo por su placa.
 - **Requerimiento:** Servicio de apoyo (no lo exige una HU).
 - **Datos de entrada:** la placa va en la dirección y el tipo nuevo (Carro, Moto o Bicicleta) va en el cuerpo en formato JSON.
@@ -42,7 +70,7 @@ Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador 
   - 400: Tipo de vehiculo no valido (u otro error de validación).
   - 404: Vehiculo no encontrado.
 
-  ## Eliminar vehículo
+## Eliminar vehículo
 
 - **Método y ruta:** DELETE /vehiculos/:placa
 - **Descripción:** elimina un vehículo registrado, buscándolo por su placa.
@@ -51,9 +79,9 @@ Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador 
 - **Ejemplo de petición:** DELETE /vehiculos/DEL123
 - **Respuestas:**
   - 200: Vehiculo eliminado.
-  - 404: Vehiculo no encontrado
+  - 404: Vehiculo no encontrado.
 
-  ## Calcular tarifa de un vehículo
+## Calcular tarifa de un vehículo
 
 - **Método y ruta:** GET /vehiculos/:placa/tarifa
 - **Descripción:** calcula cuánto cobrar por un vehículo según las horas que lleva en el parqueadero (se redondean hacia arriba y se cobra mínimo 1 hora) y la tarifa por hora de su tipo.
@@ -64,16 +92,6 @@ Eliminar vehículo	    DELETE /vehiculos/:placa	   Saca la ficha del archivador 
   - 200: devuelve placa, tipo, fechaIngreso, horas, valorHora y total (horas por valorHora).
   - 404: Vehiculo no encontrado.
   - 404: No hay tarifa para este tipo de vehiculo.
-
-  ## Listar vehículos
-
-- **Método y ruta:** GET /vehiculos
-- **Descripción:** devuelve todos los vehículos registrados.
-- **Requerimiento:** HU03
-- **Datos de entrada:** ninguno.
-- **Ejemplo de petición:** GET /vehiculos
-- **Respuestas:**
-  - 200: lista de vehículos con placa, tipo y fechaIngreso (vacía si no hay ninguno).
 
 ## Listar tarifas
 
