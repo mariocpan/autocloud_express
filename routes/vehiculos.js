@@ -5,6 +5,7 @@ const router = express.Router();
 // Importamos el modelo (la ficha del vehiculo)
 const Vehiculo = require('../models/vehiculo');
 const Tarifa  = require('../models/tarifa');
+const calcularCobro = require('../utils/cobro');
 // POST guarda un vehiculo nuevo
 router.post('/', async (req, res) => {
   try {
@@ -78,17 +79,13 @@ const vehiculo = await Vehiculo.findOne({ placa: req.params.placa.toUpperCase() 
 if (!vehiculo) {
 return res.status(404).json({mensaje:'Vehiculo no encontrado'});
 }
-// Tiempo que lleva en el parqueadero, en milisegundos
-const milisegundos = Date.now()-vehiculo.fechaIngreso;
-// Pasamos a horas, redondeamos hacia arriba y cobramos minimo 1 hora
-const  horas =  Math.max(1, Math.ceil(milisegundos / (1000*60*60)));
 // Busca la tarifa que corresponde al tipo del vehiculo
   const tarifa= await Tarifa.findOne({ tipo: vehiculo.tipo });
-  if(!tarifa) {
+    if(!tarifa) {
     return res.status(404).json({mensaje: 'No hay tarifa para este tipo de vehiculo'});
   }
-  // Total a cobrar: horas por el valor de una hora
- const total= horas * tarifa.valorHora;
+// Calculamos las horas y el total con la funcion
+  const {horas, total} = calcularCobro(vehiculo. fechaIngreso, tarifa. valorHora);
 res.json({ placa: vehiculo.placa, tipo: vehiculo.tipo, fechaIngreso:vehiculo.fechaIngreso,horas,valorHora:tarifa.valorHora,total });
 }); 
 // Exportamos las rutas para usarlas en app.js
